@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,13 @@ public class ProductController {
     @Operation(summary = "Изменить данные продукта")
     public ProductDto updateProduct(@RequestBody ProductDto dto) throws ProductNotFoundException {
         return mapper.map(productService.updateProduct(dto), ProductDto.class);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить продукт по id")
+    public ResponseEntity<String> deleteProduct(@PathVariable String id) throws ProductNotFoundException {
+        productService.deleteById(Integer.parseInt(id));
+        return ResponseEntity.ok("Продукт удален");
     }
 
 }
