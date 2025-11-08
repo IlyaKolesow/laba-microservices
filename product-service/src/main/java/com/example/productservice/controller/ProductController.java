@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -43,9 +43,10 @@ public class ProductController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать новый продукт")
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductCreationDto dto) {
-        return new ResponseEntity<>(mapper.map(productService.createProduct(dto), ProductDto.class), HttpStatus.CREATED);
+    public ProductDto createProduct(@RequestBody ProductCreationDto dto) {
+        return mapper.map(productService.createProduct(dto), ProductDto.class);
     }
 
     @PutMapping
@@ -56,9 +57,9 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удалить продукт по id")
-    public ResponseEntity<String> deleteProduct(@PathVariable int id) throws ProductNotFoundException {
+    public String deleteProduct(@PathVariable int id) throws ProductNotFoundException {
         productService.deleteById(id);
-        return ResponseEntity.ok("Продукт удален");
+        return "Продукт удален";
     }
 
 }
