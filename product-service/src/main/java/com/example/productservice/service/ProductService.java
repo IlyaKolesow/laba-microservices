@@ -18,7 +18,7 @@ public class ProductService {
 
     public Product findById(int id) throws ProductNotFoundException {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Не найдена сущность Product с id = " + id));
+                .orElseThrow(() -> new ProductNotFoundException("Не найден продукт с id = " + id));
     }
 
     public List<Product> findAll() {

@@ -22,9 +22,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - product_service_pgdata:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  product_service_pgdata:
