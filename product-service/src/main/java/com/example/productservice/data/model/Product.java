@@ -22,10 +22,10 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
     private String name;
-    private Double weight;
+    private double weight;
     private String description;
-    private Double price;
+    private double price;
 
 }
