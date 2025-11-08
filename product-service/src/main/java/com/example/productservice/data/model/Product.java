@@ -26,5 +26,6 @@ public class Product {
     private String name;
     private Double weight;
     private String description;
+    private Double price;
 
 }

@@ -31,6 +31,7 @@ public class ProductService {
                         .name(dto.getName())
                         .description(dto.getDescription())
                         .weight(dto.getWeight())
+                        .price(dto.getPrice())
                         .build()
         );
     }
@@ -41,6 +42,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setWeight(dto.getWeight());
+        product.setPrice(dto.getPrice());
 
         return productRepository.save(product);
     }

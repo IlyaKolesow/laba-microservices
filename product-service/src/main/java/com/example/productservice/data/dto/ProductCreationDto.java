@@ -10,5 +10,6 @@ public class ProductCreationDto {
     private String name;
     private Double weight;
     private String description;
+    private Double price;
 
 }
