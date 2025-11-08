@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductInventoryService {
 
     private final ProductInventoryRepository productInventoryRepository;
@@ -35,7 +36,6 @@ public class ProductInventoryService {
                 .toList());
     }
 
-    @Transactional
     public List<ProductInventory> updateProductsQuantity(int inventoryId, List<UpdateQuantityDto> dtoList)
             throws InventoryNotFoundException {
         List<Integer> productIds = dtoList.stream()

@@ -5,8 +5,10 @@ import com.example.inventoryservice.data.dto.InventoryDto;
 import com.example.inventoryservice.data.model.Inventory;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.repository.InventoryRepository;
+import com.example.inventoryservice.repository.ProductInventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,10 +17,11 @@ import java.util.List;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final ProductInventoryRepository productInventoryRepository;
 
     public Inventory findById(int id) throws InventoryNotFoundException {
         return inventoryRepository.findById(id)
-                .orElseThrow(() -> new InventoryNotFoundException("Не найдена сущность Inventory с id = " + id));
+                .orElseThrow(() -> new InventoryNotFoundException("Не найден склад с id = " + id));
     }
 
     public List<Inventory> findAll() {
@@ -43,9 +46,11 @@ public class InventoryService {
         return inventoryRepository.save(inventory);
     }
 
+    @Transactional
     public void deleteById(int id) throws InventoryNotFoundException {
         findById(id);
         inventoryRepository.deleteById(id);
+        productInventoryRepository.deleteAllByInventoryId(id);
     }
 
 }

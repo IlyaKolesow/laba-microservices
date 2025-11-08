@@ -3,6 +3,7 @@ package com.example.inventoryservice.controller;
 import com.example.inventoryservice.data.dto.InventoryCreationDto;
 import com.example.inventoryservice.data.dto.InventoryDto;
 import com.example.inventoryservice.data.dto.ProductDto;
+import com.example.inventoryservice.data.dto.ProductIdsDto;
 import com.example.inventoryservice.data.dto.UpdateQuantityDto;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.service.InventoryService;
@@ -95,8 +96,8 @@ public class InventoryController {
 
     @DeleteMapping("/{inventoryId}/products")
     @Operation(summary = "Удалить продукты со склада")
-    public String deleteProductsFromInventory(@PathVariable int inventoryId, @RequestBody List<Integer> productIds) {
-        productInventoryService.deleteProductsFromInventory(inventoryId, productIds);
+    public String deleteProductsFromInventory(@PathVariable int inventoryId, @RequestBody ProductIdsDto dto) {
+        productInventoryService.deleteProductsFromInventory(inventoryId, dto.getProductIds());
         return "Продукты удалены со склада";
     }
 
