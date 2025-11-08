@@ -2,14 +2,25 @@ package com.example.inventoryservice.controller;
 
 import com.example.inventoryservice.data.dto.InventoryCreationDto;
 import com.example.inventoryservice.data.dto.InventoryDto;
+import com.example.inventoryservice.data.dto.ProductDto;
+import com.example.inventoryservice.data.dto.UpdateQuantityDto;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.service.InventoryService;
+import com.example.inventoryservice.service.ProductInventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -19,11 +30,12 @@ import java.util.List;
 public class InventoryController {
 
     private final InventoryService inventoryService;
+    private final ProductInventoryService productInventoryService;
     private final ModelMapper mapper;
 
     @GetMapping
     @Operation(summary = "Получить все склады")
-    public List<InventoryDto> getAllProducts() {
+    public List<InventoryDto> getAllInventories() {
         return inventoryService.findAll().stream()
                 .map(product -> mapper.map(product, InventoryDto.class))
                 .toList();
@@ -31,27 +43,61 @@ public class InventoryController {
 
     @GetMapping("/{inventoryId}")
     @Operation(summary = "Получить склад по id")
-    public InventoryDto getProductById(@PathVariable String inventoryId) throws InventoryNotFoundException {
-        return mapper.map(inventoryService.findById(Integer.parseInt(inventoryId)), InventoryDto.class);
+    public InventoryDto getInventoryById(@PathVariable int inventoryId) throws InventoryNotFoundException {
+        return mapper.map(inventoryService.findById(inventoryId), InventoryDto.class);
+    }
+
+    @GetMapping("/{inventoryId}/products")
+    @Operation(summary = "Получить список продуктов на складе")
+    public List<ProductDto> getProductsFromInventory(@PathVariable int inventoryId) throws InventoryNotFoundException {
+        return productInventoryService.getProductsByInventoryId(inventoryId).stream()
+                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .toList();
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать новый склад")
-    public ResponseEntity<InventoryDto> createProduct(@RequestBody InventoryCreationDto dto) {
-        return new ResponseEntity<>(mapper.map(inventoryService.createInventory(dto), InventoryDto.class), HttpStatus.CREATED);
+    public InventoryDto createInventory(@RequestBody InventoryCreationDto dto) {
+        return mapper.map(inventoryService.createInventory(dto), InventoryDto.class);
+    }
+
+    @PostMapping("/{inventoryId}/products")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Добавить продукты на склад")
+    public List<ProductDto> addProductsToInventory(@PathVariable int inventoryId, @RequestBody List<ProductDto> dto) {
+        return productInventoryService.addProductsToInventory(inventoryId, dto).stream()
+                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .toList();
     }
 
     @PutMapping
     @Operation(summary = "Изменить данные склада")
-    public InventoryDto updateProduct(@RequestBody InventoryDto dto) throws InventoryNotFoundException {
+    public InventoryDto updateInventory(@RequestBody InventoryDto dto) throws InventoryNotFoundException {
         return mapper.map(inventoryService.updateInventory(dto), InventoryDto.class);
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{inventoryId}/products/quantity")
+    @Operation(summary = "Изменить количество продуктов на складе")
+    public List<ProductDto> updateProductsQuantity(@PathVariable int inventoryId, @RequestBody List<UpdateQuantityDto> dto)
+            throws InventoryNotFoundException {
+        return productInventoryService.updateProductsQuantity(inventoryId, dto).stream()
+                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .toList();
+    }
+
+    @DeleteMapping("/{inventoryId}")
     @Operation(summary = "Удалить склад по id")
-    public ResponseEntity<String> deleteProduct(@PathVariable String id) throws InventoryNotFoundException {
-        inventoryService.deleteById(Integer.parseInt(id));
-        return ResponseEntity.ok("Склад удален");
+    public String deleteInventory(@PathVariable int inventoryId) throws InventoryNotFoundException {
+        inventoryService.deleteById(inventoryId);
+        return "Склад удален";
+    }
+
+    @DeleteMapping("/{inventoryId}/products")
+    @Operation(summary = "Удалить продукты со склада")
+    public String deleteProductsFromInventory(@PathVariable int inventoryId, @RequestBody List<Integer> productIds) {
+        productInventoryService.deleteProductsFromInventory(inventoryId, productIds);
+        return "Продукты удалены со склада";
     }
 
 }

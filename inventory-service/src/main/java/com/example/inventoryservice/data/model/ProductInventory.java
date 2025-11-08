@@ -1,5 +1,6 @@
 package com.example.inventoryservice.data.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,9 +23,14 @@ public class ProductInventory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Integer productId;
-    private Integer inventoryId;
-    private Integer quantity;
+    private int id;
+
+    @Column(name = "product_id")
+    private int productId;
+
+    @Column(name = "inventory_id")
+    private int inventoryId;
+
+    private int quantity;
 
 }

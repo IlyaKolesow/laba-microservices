@@ -5,10 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class InventoryDto {
+public class ProductDto {
 
-    private int id;
-    private String name;
-    private String city;
+    private int productId;
+    private int quantity;
 
 }
