@@ -38,8 +38,8 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить продукт по id")
-    public ProductDto getProductById(@PathVariable String id) throws ProductNotFoundException {
-        return mapper.map(productService.findById(Integer.parseInt(id)), ProductDto.class);
+    public ProductDto getProductById(@PathVariable int id) throws ProductNotFoundException {
+        return mapper.map(productService.findById(id), ProductDto.class);
     }
 
     @PostMapping
@@ -56,8 +56,8 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Удалить продукт по id")
-    public ResponseEntity<String> deleteProduct(@PathVariable String id) throws ProductNotFoundException {
-        productService.deleteById(Integer.parseInt(id));
+    public ResponseEntity<String> deleteProduct(@PathVariable int id) throws ProductNotFoundException {
+        productService.deleteById(id);
         return ResponseEntity.ok("Продукт удален");
     }
 
