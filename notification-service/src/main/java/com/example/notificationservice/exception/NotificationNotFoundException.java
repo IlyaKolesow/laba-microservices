@@ -1,0 +1,9 @@
+package com.example.notificationservice.exception;
+
+public class NotificationNotFoundException extends NotificationException {
+
+    public NotificationNotFoundException(String message) {
+        super(message);
+    }
+
+}
