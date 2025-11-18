@@ -4,7 +4,9 @@ import com.example.inventoryservice.data.dto.InventoryCreationDto;
 import com.example.inventoryservice.data.dto.InventoryDto;
 import com.example.inventoryservice.data.dto.ProductDto;
 import com.example.inventoryservice.data.dto.ProductIdsDto;
+import com.example.inventoryservice.data.dto.ProductInventoryDto;
 import com.example.inventoryservice.data.dto.UpdateQuantityDto;
+import com.example.inventoryservice.exception.InventoryBadRequestException;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.service.InventoryService;
 import com.example.inventoryservice.service.ProductInventoryService;
@@ -56,6 +58,14 @@ public class InventoryController {
                 .toList();
     }
 
+    @GetMapping("/product/{productId}")
+    @Operation(summary = "Получить список складов, где есть данный продукт")
+    public List<ProductInventoryDto> getInventoriesByProduct(@PathVariable int productId) {
+        return productInventoryService.getInventoriesByProductId(productId).stream()
+                .map(productInventory -> mapper.map(productInventory, ProductInventoryDto.class))
+                .toList();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать новый склад")
@@ -78,11 +88,11 @@ public class InventoryController {
         return mapper.map(inventoryService.updateInventory(dto), InventoryDto.class);
     }
 
-    @PatchMapping("/{inventoryId}/products/quantity")
+    @PatchMapping("/products/quantity")
     @Operation(summary = "Изменить количество продуктов на складе")
-    public List<ProductDto> updateProductsQuantity(@PathVariable int inventoryId, @RequestBody List<UpdateQuantityDto> dto)
-            throws InventoryNotFoundException {
-        return productInventoryService.updateProductsQuantity(inventoryId, dto).stream()
+    public List<ProductDto> updateProductsQuantity(@RequestBody List<UpdateQuantityDto> dto)
+            throws InventoryNotFoundException, InventoryBadRequestException {
+        return productInventoryService.updateProductsQuantity(dto).stream()
                 .map(productInventory -> mapper.map(productInventory, ProductDto.class))
                 .toList();
     }

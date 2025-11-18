@@ -10,6 +10,7 @@ import java.util.List;
 public interface ProductInventoryRepository extends JpaRepository<ProductInventory, Integer> {
 
     List<ProductInventory> findByInventoryId(int id);
+    List<ProductInventory> findByProductId(int id);
     List<ProductInventory> findAllByInventoryIdAndProductIdIn(int inventoryId, List<Integer> productIds);
     void deleteAllByInventoryIdAndProductIdIn(int inventoryId, List<Integer> productIds);
     void deleteAllByInventoryId(int inventoryId);
