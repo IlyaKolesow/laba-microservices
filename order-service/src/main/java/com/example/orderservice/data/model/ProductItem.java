@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductItem {
 
-    private String productId;
+    private int productId;
     private String name;
     private int quantity;
     private double price;

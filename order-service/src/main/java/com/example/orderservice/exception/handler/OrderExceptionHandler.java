@@ -1,6 +1,7 @@
 package com.example.orderservice.exception.handler;
 
 import com.example.orderservice.data.dto.ErrorDto;
+import com.example.orderservice.exception.OrderNotEnoughProducts;
 import com.example.orderservice.exception.OrderNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,12 @@ public class OrderExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDto handleException(OrderNotFoundException e) {
         return ErrorDto.builder().code("404").message(e.getMessage()).build();
+    }
+
+    @ExceptionHandler(OrderNotEnoughProducts.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDto handleException(OrderNotEnoughProducts e) {
+        return ErrorDto.builder().code("400").message(e.getMessage()).build();
     }
 
 }

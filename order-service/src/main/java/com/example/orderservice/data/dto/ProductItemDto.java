@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProductItemDto {
 
-    private String productId;
+    private int productId;
     private String name;
     private int quantity;
     private double price;

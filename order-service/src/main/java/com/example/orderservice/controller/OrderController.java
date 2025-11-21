@@ -2,6 +2,7 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.OrderDto;
+import com.example.orderservice.exception.OrderNotEnoughProducts;
 import com.example.orderservice.exception.OrderNotFoundException;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.util.OrderMapper;
@@ -34,7 +35,7 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать новый заказ")
-    public OrderDto createOrder(@RequestBody OrderCreationDto dto) {
+    public OrderDto createOrder(@RequestBody OrderCreationDto dto) throws OrderNotEnoughProducts {
         return OrderMapper.mapOrder(orderService.createOrder(dto));
     }
 
