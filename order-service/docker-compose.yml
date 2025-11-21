@@ -12,6 +12,8 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@mongo:27017/order-service?authSource=admin
       SPRING_APPLICATION_NAME: order-service
+    networks:
+      - laba-microservices
 
   mongo:
     image: mongo:7
@@ -29,6 +31,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - laba-microservices
 
 volumes:
   order_service_mongo_data:
+
+networks:
+  laba-microservices:
+    external: true

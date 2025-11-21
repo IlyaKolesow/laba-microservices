@@ -13,6 +13,8 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - laba-microservices
 
   db:
     image: postgres:16
@@ -25,6 +27,12 @@ services:
       - "5433:5432"
     volumes:
       - inventory_service_pgdata:/var/lib/postgresql/data
+    networks:
+      - laba-microservices
 
 volumes:
   inventory_service_pgdata:
+
+networks:
+  laba-microservices:
+    external: true
