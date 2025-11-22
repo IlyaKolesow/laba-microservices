@@ -1,9 +1,10 @@
 package com.example.inventoryservice.service;
 
-import com.example.inventoryservice.data.dto.ProductDto;
+import com.example.inventoryservice.data.dto.ProductQuantityDto;
 import com.example.inventoryservice.data.dto.UpdateQuantityDto;
 import com.example.inventoryservice.data.model.ProductInventory;
 import com.example.inventoryservice.exception.InventoryBadRequestException;
+import com.example.inventoryservice.exception.InventoryNotEnoughProducts;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.repository.ProductInventoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ public class ProductInventoryService {
         return productInventoryRepository.findByProductId(id);
     }
 
-    public List<ProductInventory> addProductsToInventory(int inventoryId, List<ProductDto> products) {
+    public List<ProductInventory> addProductsToInventory(int inventoryId, List<ProductQuantityDto> products) {
         return productInventoryRepository.saveAll(products.stream()
                 .map(product -> ProductInventory.builder()
                         .inventoryId(inventoryId)
@@ -77,7 +79,7 @@ public class ProductInventoryService {
 
                 if (newQuantity < 0) {
                     throw new InventoryBadRequestException(
-                            "Недостаточно продуктов на складе inventoryId = " + inventoryId + ", productId = " + productId
+                            "Недостаточно продукта на складе inventoryId = " + inventoryId + ", productId = " + productId
                     );
                 } else if (newQuantity == 0) {
                     entitiesToDelete.add(productInventory);
@@ -93,6 +95,57 @@ public class ProductInventoryService {
 
     public void deleteProductsFromInventory(int inventoryId, List<Integer> productIds) {
         productInventoryRepository.deleteAllByInventoryIdAndProductIdIn(inventoryId, productIds);
+    }
+
+    public void takeProductsFromInventories(List<ProductQuantityDto> products)
+            throws InventoryNotFoundException, InventoryBadRequestException, InventoryNotEnoughProducts {
+        List<UpdateQuantityDto> updateQuantityDtoList = new ArrayList<>();
+        for (ProductQuantityDto product : products) {
+            List<ProductInventory> inventories = getInventoriesByProductId(product.getProductId())
+                    .stream()
+                    .sorted(Comparator.comparing(ProductInventory::getQuantity).reversed())
+                    .toList();
+
+            int requiredQuantity = product.getQuantity();
+
+            if (!isEnoughProductInInventories(inventories.stream().map(ProductInventory::getQuantity).toList(),
+                    requiredQuantity)) {
+                throw new InventoryNotEnoughProducts(
+                        "Недостаточно продукта на складах (productId = " + product.getProductId() + ")"
+                );
+            }
+
+            int takenQuantity = 0;
+            int remainingQuantity;
+
+            for (ProductInventory inventory : inventories) {
+                UpdateQuantityDto dto = UpdateQuantityDto.builder()
+                        .inventoryId(inventory.getInventoryId())
+                        .productId(product.getProductId())
+                        .build();
+                updateQuantityDtoList.add(dto);
+
+                remainingQuantity = requiredQuantity - takenQuantity;
+                if (remainingQuantity <= inventory.getQuantity()) {
+                    dto.setDelta(-remainingQuantity);
+                    break;
+                }
+                dto.setDelta(-inventory.getQuantity());
+                takenQuantity += inventory.getQuantity();
+            }
+        }
+        updateProductsQuantity(updateQuantityDtoList);
+    }
+
+    private boolean isEnoughProductInInventories(List<Integer> inventoriesQuantity, int requiredQuantity) {
+        int quantityInInventories = 0;
+        for (int inventoryQuantity : inventoriesQuantity) {
+            quantityInInventories += inventoryQuantity;
+            if (quantityInInventories >= requiredQuantity) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

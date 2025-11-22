@@ -2,11 +2,12 @@ package com.example.inventoryservice.controller;
 
 import com.example.inventoryservice.data.dto.InventoryCreationDto;
 import com.example.inventoryservice.data.dto.InventoryDto;
-import com.example.inventoryservice.data.dto.ProductDto;
+import com.example.inventoryservice.data.dto.ProductQuantityDto;
 import com.example.inventoryservice.data.dto.ProductIdsDto;
 import com.example.inventoryservice.data.dto.ProductInventoryDto;
 import com.example.inventoryservice.data.dto.UpdateQuantityDto;
 import com.example.inventoryservice.exception.InventoryBadRequestException;
+import com.example.inventoryservice.exception.InventoryNotEnoughProducts;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import com.example.inventoryservice.service.InventoryService;
 import com.example.inventoryservice.service.ProductInventoryService;
@@ -52,9 +53,9 @@ public class InventoryController {
 
     @GetMapping("/{inventoryId}/products")
     @Operation(summary = "Получить список продуктов на складе")
-    public List<ProductDto> getProductsFromInventory(@PathVariable int inventoryId) throws InventoryNotFoundException {
+    public List<ProductQuantityDto> getProductsFromInventory(@PathVariable int inventoryId) throws InventoryNotFoundException {
         return productInventoryService.getProductsByInventoryId(inventoryId).stream()
-                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .map(productInventory -> mapper.map(productInventory, ProductQuantityDto.class))
                 .toList();
     }
 
@@ -75,10 +76,10 @@ public class InventoryController {
 
     @PostMapping("/{inventoryId}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Добавить продукты на склад")
-    public List<ProductDto> addProductsToInventory(@PathVariable int inventoryId, @RequestBody List<ProductDto> dto) {
+    @Operation(summary = "Добавить продукты на склад (продуктов еще нет на складе)")
+    public List<ProductQuantityDto> addProductsToInventory(@PathVariable int inventoryId, @RequestBody List<ProductQuantityDto> dto) {
         return productInventoryService.addProductsToInventory(inventoryId, dto).stream()
-                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .map(productInventory -> mapper.map(productInventory, ProductQuantityDto.class))
                 .toList();
     }
 
@@ -89,12 +90,20 @@ public class InventoryController {
     }
 
     @PatchMapping("/products/quantity")
-    @Operation(summary = "Изменить количество продуктов на складе")
-    public List<ProductDto> updateProductsQuantity(@RequestBody List<UpdateQuantityDto> dto)
+    @Operation(summary = "Изменить количество продуктов на складе (продукты уже есть на складе)")
+    public List<ProductQuantityDto> updateProductsQuantity(@RequestBody List<UpdateQuantityDto> dto)
             throws InventoryNotFoundException, InventoryBadRequestException {
         return productInventoryService.updateProductsQuantity(dto).stream()
-                .map(productInventory -> mapper.map(productInventory, ProductDto.class))
+                .map(productInventory -> mapper.map(productInventory, ProductQuantityDto.class))
                 .toList();
+    }
+
+    @PatchMapping("/products/take")
+    @Operation(summary = "Забрать продукты со склада/складов")
+    public String takeProductsFromInventories(@RequestBody List<ProductQuantityDto> products)
+            throws InventoryNotFoundException, InventoryBadRequestException, InventoryNotEnoughProducts {
+        productInventoryService.takeProductsFromInventories(products);
+        return "Продукты успешно забраны";
     }
 
     @DeleteMapping("/{inventoryId}")

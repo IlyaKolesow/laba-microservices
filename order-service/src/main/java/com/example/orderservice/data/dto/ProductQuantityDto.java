@@ -1,16 +1,13 @@
 package com.example.orderservice.data.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-public class UpdateQuantityDto {
+public class ProductQuantityDto {
 
-    private int inventoryId;
     private int productId;
-    private int delta;
+    private int quantity;
 
 }

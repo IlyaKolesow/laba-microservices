@@ -1,7 +1,7 @@
 package com.example.orderservice.client.inventory;
 
 import com.example.orderservice.data.dto.ProductInventoryDto;
-import com.example.orderservice.data.dto.UpdateQuantityDto;
+import com.example.orderservice.data.dto.ProductQuantityDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -20,10 +20,10 @@ public class InventoryRestClient {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
-    public void updateProductsQuantity(List<UpdateQuantityDto> dto) {
+    public void takeProductsFromInventories(List<ProductQuantityDto> products) {
         restClient.patch()
-                .uri("/products/quantity")
-                .body(dto)
+                .uri("/products/take")
+                .body(products)
                 .retrieve()
                 .toBodilessEntity();
     }
