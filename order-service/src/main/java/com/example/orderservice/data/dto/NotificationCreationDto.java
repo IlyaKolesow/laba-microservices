@@ -1,4 +1,4 @@
-package com.example.notificationservice.data.dto;
+package com.example.orderservice.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

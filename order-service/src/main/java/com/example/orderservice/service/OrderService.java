@@ -1,6 +1,7 @@
 package com.example.orderservice.service;
 
 import com.example.orderservice.client.inventory.InventoryRestClient;
+import com.example.orderservice.data.dto.NotificationCreationDto;
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.ProductQuantityDto;
 import com.example.orderservice.data.model.Order;
@@ -20,6 +21,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryRestClient inventoryRestClient;
+    private final NotificationService notificationService;
     private final ModelMapper mapper;
 
     public Order findById(String id) throws OrderNotFoundException {
@@ -35,17 +37,20 @@ public class OrderService {
         inventoryRestClient.takeProductsFromInventories(dto.getProducts().stream()
                 .map(product -> mapper.map(product, ProductQuantityDto.class))
                 .toList());
-
         double totalPrice = dto.getProducts().stream()
                 .mapToDouble(productDto -> productDto.getPrice() * productDto.getQuantity())
                 .sum();
-
-        return orderRepository.save(Order.builder()
+        Order order = orderRepository.save(Order.builder()
                 .customerName(dto.getCustomerName())
                 .totalPrice(totalPrice)
                 .createdAt(LocalDateTime.now())
                 .products(dto.getProducts().stream().map(OrderMapper::mapProduct).toList())
                 .build());
+        notificationService.send(NotificationCreationDto.builder()
+                .type("ORDER_CREATED")
+                .message("Заказ создан (orderId = " + order.getId() + ", customerName = " + order.getCustomerName() + ")")
+                .build());
+        return order;
     }
 
     public void cancelOrder(String id) throws OrderNotFoundException {
