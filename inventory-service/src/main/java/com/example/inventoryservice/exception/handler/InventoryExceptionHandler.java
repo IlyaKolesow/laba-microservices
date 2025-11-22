@@ -2,6 +2,7 @@ package com.example.inventoryservice.exception.handler;
 
 import com.example.inventoryservice.data.dto.ErrorDto;
 import com.example.inventoryservice.exception.InventoryBadRequestException;
+import com.example.inventoryservice.exception.InventoryNotEnoughProducts;
 import com.example.inventoryservice.exception.InventoryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,12 @@ public class InventoryExceptionHandler {
     @ExceptionHandler(InventoryBadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto handleException(InventoryBadRequestException e) {
+        return ErrorDto.builder().code("400").message(e.getMessage()).build();
+    }
+
+    @ExceptionHandler(InventoryNotEnoughProducts.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDto handleException(InventoryNotEnoughProducts e) {
         return ErrorDto.builder().code("400").message(e.getMessage()).build();
     }
 

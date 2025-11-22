@@ -2,14 +2,20 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.OrderDto;
-import com.example.orderservice.exception.OrderNotEnoughProducts;
 import com.example.orderservice.exception.OrderNotFoundException;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.util.OrderMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -35,7 +41,7 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать новый заказ")
-    public OrderDto createOrder(@RequestBody OrderCreationDto dto) throws OrderNotEnoughProducts {
+    public OrderDto createOrder(@RequestBody OrderCreationDto dto) {
         return OrderMapper.mapOrder(orderService.createOrder(dto));
     }
 

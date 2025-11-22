@@ -4,7 +4,6 @@ import com.example.orderservice.client.inventory.InventoryRestClient;
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.ProductQuantityDto;
 import com.example.orderservice.data.model.Order;
-import com.example.orderservice.exception.OrderNotEnoughProducts;
 import com.example.orderservice.exception.OrderNotFoundException;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.util.OrderMapper;
@@ -32,7 +31,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public Order createOrder(OrderCreationDto dto) throws OrderNotEnoughProducts {
+    public Order createOrder(OrderCreationDto dto) {
         inventoryRestClient.takeProductsFromInventories(dto.getProducts().stream()
                 .map(product -> mapper.map(product, ProductQuantityDto.class))
                 .toList());
