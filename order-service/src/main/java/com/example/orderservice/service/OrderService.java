@@ -54,8 +54,12 @@ public class OrderService {
     }
 
     public void cancelOrder(String id) throws OrderNotFoundException {
-        findById(id);
+        Order order = findById(id);
         orderRepository.deleteById(id);
+        notificationService.send(NotificationCreationDto.builder()
+                .type("ORDER_CANCELED")
+                .message("Заказ отменен (orderId = " + order.getId() + ", customerName = " + order.getCustomerName() + ")")
+                .build());
     }
 
 }
