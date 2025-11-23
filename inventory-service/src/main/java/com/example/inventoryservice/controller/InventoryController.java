@@ -100,10 +100,9 @@ public class InventoryController {
 
     @PatchMapping("/products/take")
     @Operation(summary = "Забрать продукты со склада/складов")
-    public String takeProductsFromInventories(@RequestBody List<ProductQuantityDto> products)
+    public List<UpdateQuantityDto> takeProductsFromInventories(@RequestBody List<ProductQuantityDto> products)
             throws InventoryNotFoundException, InventoryBadRequestException, InventoryNotEnoughProducts {
-        productInventoryService.takeProductsFromInventories(products);
-        return "Продукты успешно забраны";
+        return productInventoryService.takeProductsFromInventories(products);
     }
 
     @DeleteMapping("/{inventoryId}")

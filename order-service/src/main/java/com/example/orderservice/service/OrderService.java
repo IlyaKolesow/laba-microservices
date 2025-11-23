@@ -4,6 +4,7 @@ import com.example.orderservice.client.inventory.InventoryRestClient;
 import com.example.orderservice.data.dto.NotificationCreationDto;
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.ProductQuantityDto;
+import com.example.orderservice.data.model.InventoryQuantityChange;
 import com.example.orderservice.data.model.Order;
 import com.example.orderservice.exception.OrderNotFoundException;
 import com.example.orderservice.repository.OrderRepository;
@@ -34,9 +35,10 @@ public class OrderService {
     }
 
     public Order createOrder(OrderCreationDto dto) {
-        inventoryRestClient.takeProductsFromInventories(dto.getProducts().stream()
-                .map(product -> mapper.map(product, ProductQuantityDto.class))
-                .toList());
+        List<InventoryQuantityChange> inventoryQuantityChanges = inventoryRestClient.takeProductsFromInventories(
+                dto.getProducts().stream()
+                        .map(product -> mapper.map(product, ProductQuantityDto.class))
+                        .toList());
         double totalPrice = dto.getProducts().stream()
                 .mapToDouble(productDto -> productDto.getPrice() * productDto.getQuantity())
                 .sum();
@@ -45,6 +47,7 @@ public class OrderService {
                 .totalPrice(totalPrice)
                 .createdAt(LocalDateTime.now())
                 .products(dto.getProducts().stream().map(OrderMapper::mapProduct).toList())
+                .inventoryQuantityChanges(inventoryQuantityChanges)
                 .build());
         notificationService.send(NotificationCreationDto.builder()
                 .type("ORDER_CREATED")
@@ -56,6 +59,9 @@ public class OrderService {
     public void cancelOrder(String id) throws OrderNotFoundException {
         Order order = findById(id);
         orderRepository.deleteById(id);
+        inventoryRestClient.updateProductsQuantityInInventories(order.getInventoryQuantityChanges().stream()
+                .peek(quantityChange -> quantityChange.setDelta(Math.abs(quantityChange.getDelta())))
+                .toList());
         notificationService.send(NotificationCreationDto.builder()
                 .type("ORDER_CANCELED")
                 .message("Заказ отменен (orderId = " + order.getId() + ", customerName = " + order.getCustomerName() + ")")

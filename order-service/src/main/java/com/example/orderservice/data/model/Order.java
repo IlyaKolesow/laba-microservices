@@ -25,5 +25,6 @@ public class Order {
     private LocalDateTime createdAt;
     private double totalPrice;
     private List<ProductItem> products;
+    private List<InventoryQuantityChange> inventoryQuantityChanges;
 
 }

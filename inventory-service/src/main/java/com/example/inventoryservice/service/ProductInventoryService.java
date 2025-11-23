@@ -97,7 +97,7 @@ public class ProductInventoryService {
         productInventoryRepository.deleteAllByInventoryIdAndProductIdIn(inventoryId, productIds);
     }
 
-    public void takeProductsFromInventories(List<ProductQuantityDto> products)
+    public List<UpdateQuantityDto> takeProductsFromInventories(List<ProductQuantityDto> products)
             throws InventoryNotFoundException, InventoryBadRequestException, InventoryNotEnoughProducts {
         List<UpdateQuantityDto> updateQuantityDtoList = new ArrayList<>();
         for (ProductQuantityDto product : products) {
@@ -135,6 +135,7 @@ public class ProductInventoryService {
             }
         }
         updateProductsQuantity(updateQuantityDtoList);
+        return updateQuantityDtoList;
     }
 
     private boolean isEnoughProductInInventories(List<Integer> inventoriesQuantity, int requiredQuantity) {
