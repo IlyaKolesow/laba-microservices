@@ -1,4 +1,7 @@
 services:
+
+##### KAFKA #####
+
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
@@ -17,9 +20,159 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-    networks:
-      - laba-microservices
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 9092" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
-networks:
-  laba-microservices:
-    external: true
+
+##### PRODUCT SERVICE #####
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    image: product-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      product-service-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://product-service-db:5432/product-service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  product-service-db:
+    image: postgres:16
+    container_name: product-service-postgres-db
+    environment:
+      POSTGRES_DB: product-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - product_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d product-service -h localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+
+##### INVENTORY SERVICE #####
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    image: inventory-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      inventory-service-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://inventory-service-db:5432/inventory-service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+  inventory-service-db:
+    image: postgres:16
+    container_name: inventory-service-postgres-db
+    environment:
+      POSTGRES_DB: inventory-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - inventory_service_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory-service -h localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+
+##### ORDER SERVICE #####
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    image: order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      order-service-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@order-service-db:27017/order-service?authSource=admin
+      SPRING_APPLICATION_NAME: order-service
+
+  order-service-db:
+    image: mongo:7
+    container_name: order-service-mongo-db
+    ports:
+      - "27018:27017"
+    volumes:
+      - order_service_mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: order-service
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+
+##### NOTIFICATION SERVICE #####
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    image: notification-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      notification-service-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@notification-service-db:27017/notification-service?authSource=admin
+      SPRING_APPLICATION_NAME: notification-service
+
+  notification-service-db:
+    image: mongo:7
+    container_name: notification-service-mongo-db
+    ports:
+      - "27019:27017"
+    volumes:
+      - notification_service_mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: notification-service
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  notification_service_mongo_data:
+  product_service_pgdata:
+  inventory_service_pgdata:
+  order_service_mongo_data:
