@@ -1,6 +1,6 @@
 package com.example.orderservice.service;
 
-import com.example.orderservice.client.inventory.InventoryRestClient;
+import com.example.orderservice.client.inventory.InventoryClient;
 import com.example.orderservice.data.dto.NotificationCreationDto;
 import com.example.orderservice.data.dto.OrderCreationDto;
 import com.example.orderservice.data.dto.ProductQuantityDto;
@@ -21,7 +21,7 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final InventoryRestClient inventoryRestClient;
+    private final InventoryClient inventoryClient;
     private final NotificationService notificationService;
     private final ModelMapper mapper;
 
@@ -35,7 +35,7 @@ public class OrderService {
     }
 
     public Order createOrder(OrderCreationDto dto) {
-        List<InventoryQuantityChange> inventoryQuantityChanges = inventoryRestClient.takeProductsFromInventories(
+        List<InventoryQuantityChange> inventoryQuantityChanges = inventoryClient.takeProductsFromInventories(
                 dto.getProducts().stream()
                         .map(product -> mapper.map(product, ProductQuantityDto.class))
                         .toList());
@@ -59,7 +59,7 @@ public class OrderService {
     public void cancelOrder(String id) throws OrderNotFoundException {
         Order order = findById(id);
         orderRepository.deleteById(id);
-        inventoryRestClient.updateProductsQuantityInInventories(order.getInventoryQuantityChanges().stream()
+        inventoryClient.updateProductsQuantityInInventories(order.getInventoryQuantityChanges().stream()
                 .peek(quantityChange -> quantityChange.setDelta(Math.abs(quantityChange.getDelta())))
                 .toList());
         notificationService.send(NotificationCreationDto.builder()

@@ -117,6 +117,8 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@order-service-db:27017/order-service?authSource=admin
       SPRING_APPLICATION_NAME: order-service
+      SPRING_PROFILES_ACTIVE: grpc
+#      SPRING_PROFILES_ACTIVE: rest
 
   order-service-db:
     image: mongo:7
