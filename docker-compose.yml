@@ -72,6 +72,7 @@ services:
     image: inventory-service
     ports:
       - "8081:8081"
+      - "9090:9090"
     depends_on:
       inventory-service-db:
         condition: service_healthy

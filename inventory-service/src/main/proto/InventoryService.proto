@@ -1,0 +1,32 @@
+syntax = "proto3";
+package com.example.inventoryservice;
+
+message ProductQuantityDto {
+  int32 productId = 1;
+  int32 quantity = 2;
+}
+
+message UpdateQuantityDto {
+  int32 inventoryId = 1;
+  int32 productId = 2;
+  int32 delta = 3;
+}
+
+message TakeProductsRequest {
+  repeated ProductQuantityDto products = 1;
+}
+
+message TakeProductsResponse {
+  repeated UpdateQuantityDto changes = 1;
+}
+
+message UpdateQuantityRequest {
+  repeated UpdateQuantityDto changes = 1;
+}
+
+message UpdateQuantityResponse {}
+
+service InventoryService {
+  rpc takeProductsFromInventories(TakeProductsRequest) returns (TakeProductsResponse);
+  rpc updateProductsQuantityInInventories(UpdateQuantityRequest) returns (UpdateQuantityResponse);
+}
