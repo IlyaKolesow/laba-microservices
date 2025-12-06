@@ -1,4 +1,4 @@
-package com.example.orderservice.data.dto;
+package com.example.graphqlservice.data.dto;
 
 import lombok.Getter;
 import lombok.Setter;

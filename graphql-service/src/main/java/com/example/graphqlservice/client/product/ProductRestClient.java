@@ -1,6 +1,6 @@
 package com.example.graphqlservice.client.product;
 
-import com.example.graphqlservice.data.Product;
+import com.example.graphqlservice.data.model.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 

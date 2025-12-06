@@ -3,6 +3,11 @@ type Query {
     orders: [Order]
 }
 
+type Mutation {
+    createOrder(dto: OrderCreationDto!): Order
+    cancelOrder(id: String!): String
+}
+
 type Order {
     id: ID
     customerName: String
@@ -18,4 +23,14 @@ type Product {
     price: Float
     weight: Float
     description: String
+}
+
+input ProductQuantityDto {
+    productId: Int!
+    quantity: Int!
+}
+
+input OrderCreationDto {
+    customerName: String!
+    products: [ProductQuantityDto]
 }

@@ -3,7 +3,6 @@ package com.example.orderservice.service;
 import com.example.orderservice.client.inventory.InventoryClient;
 import com.example.orderservice.data.dto.NotificationCreationDto;
 import com.example.orderservice.data.dto.OrderCreationDto;
-import com.example.orderservice.data.dto.ProductQuantityDto;
 import com.example.orderservice.data.model.InventoryQuantityChange;
 import com.example.orderservice.data.model.Order;
 import com.example.orderservice.exception.OrderNotFoundException;
@@ -35,16 +34,10 @@ public class OrderService {
     }
 
     public Order createOrder(OrderCreationDto dto) {
-        List<InventoryQuantityChange> inventoryQuantityChanges = inventoryClient.takeProductsFromInventories(
-                dto.getProducts().stream()
-                        .map(product -> mapper.map(product, ProductQuantityDto.class))
-                        .toList());
-        double totalPrice = dto.getProducts().stream()
-                .mapToDouble(productDto -> productDto.getPrice() * productDto.getQuantity())
-                .sum();
+        List<InventoryQuantityChange> inventoryQuantityChanges = inventoryClient
+                .takeProductsFromInventories(dto.getProducts());
         Order order = orderRepository.save(Order.builder()
                 .customerName(dto.getCustomerName())
-                .totalPrice(totalPrice)
                 .createdAt(LocalDateTime.now())
                 .products(dto.getProducts().stream().map(OrderMapper::mapProduct).toList())
                 .inventoryQuantityChanges(inventoryQuantityChanges)

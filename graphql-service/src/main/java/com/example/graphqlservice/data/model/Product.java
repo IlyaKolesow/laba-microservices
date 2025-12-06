@@ -1,4 +1,4 @@
-package com.example.graphqlservice.data;
+package com.example.graphqlservice.data.model;
 
 import lombok.Getter;
 import lombok.Setter;

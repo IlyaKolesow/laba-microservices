@@ -1,6 +1,7 @@
 package com.example.graphqlservice.client.order;
 
-import com.example.graphqlservice.data.Order;
+import com.example.graphqlservice.data.dto.OrderCreationDto;
+import com.example.graphqlservice.data.model.Order;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -31,6 +32,20 @@ public class OrderRestClient {
         return restClient.get()
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
+    }
+
+    public Order createOrder(OrderCreationDto dto) {
+        return restClient.post()
+                .body(dto)
+                .retrieve()
+                .body(Order.class);
+    }
+
+    public String cancelOrder(String id) {
+        return restClient.delete()
+                .uri("/{id}", id)
+                .retrieve()
+                .body(String.class);
     }
 
 }

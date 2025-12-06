@@ -23,7 +23,6 @@ public class Order {
     private String id;
     private String customerName;
     private LocalDateTime createdAt;
-    private double totalPrice;
     private List<ProductItem> products;
     private List<InventoryQuantityChange> inventoryQuantityChanges;
 

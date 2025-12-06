@@ -1,4 +1,4 @@
-package com.example.orderservice.data.dto;
+package com.example.graphqlservice.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,9 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductItemDto {
+public class ProductQuantityDto {
 
     private int productId;
-    private String name;
     private int quantity;
-    private double price;
 
 }

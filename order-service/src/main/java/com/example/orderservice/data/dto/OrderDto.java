@@ -19,7 +19,6 @@ public class OrderDto {
     private String id;
     private String customerName;
     private LocalDateTime createdAt;
-    private double totalPrice;
-    private List<ProductItemDto> products;
+    private List<ProductQuantityDto> products;
 
 }

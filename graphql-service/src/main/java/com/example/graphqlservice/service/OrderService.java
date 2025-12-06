@@ -2,8 +2,9 @@ package com.example.graphqlservice.service;
 
 import com.example.graphqlservice.client.order.OrderRestClient;
 import com.example.graphqlservice.client.product.ProductRestClient;
-import com.example.graphqlservice.data.Order;
-import com.example.graphqlservice.data.Product;
+import com.example.graphqlservice.data.dto.OrderCreationDto;
+import com.example.graphqlservice.data.model.Order;
+import com.example.graphqlservice.data.model.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,17 +19,25 @@ public class OrderService {
 
     public Order getOrderById(String id) {
         Order order = orderRestClient.getOrder(id);
-        setProducts(order);
+        populateOrder(order);
         return order;
     }
 
     public List<Order> getAllOrders() {
         List<Order> orders = orderRestClient.getOrders();
-        orders.forEach(this::setProducts);
+        orders.forEach(this::populateOrder);
         return orders;
     }
 
-    private void setProducts(Order order) {
+    public Order createOrder(OrderCreationDto dto) {
+        return orderRestClient.createOrder(dto);
+    }
+
+    public String cancelOrder(String id) {
+        return orderRestClient.cancelOrder(id);
+    }
+
+    private void populateOrder(Order order) {
         List<Product> orderProducts = order.getProducts();
         double totalPrice = 0;
         for (Product orderProduct : orderProducts) {
@@ -41,4 +50,5 @@ public class OrderService {
         }
         order.setTotalPrice(totalPrice);
     }
+
 }

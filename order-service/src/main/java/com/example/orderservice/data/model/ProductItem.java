@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 public class ProductItem {
 
     private int productId;
-    private String name;
     private int quantity;
-    private double price;
 
 }
