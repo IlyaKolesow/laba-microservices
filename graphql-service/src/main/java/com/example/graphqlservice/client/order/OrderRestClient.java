@@ -2,7 +2,9 @@ package com.example.graphqlservice.client.order;
 
 import com.example.graphqlservice.data.dto.OrderCreationDto;
 import com.example.graphqlservice.data.model.Order;
+import com.example.graphqlservice.exception.GraphQLOrderRequestRuntimeException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -13,12 +15,12 @@ public class OrderRestClient {
 
     private final RestClient restClient = RestClient.builder()
             .baseUrl("http://order-service:8082/api/orders")
-//            .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
-//                if (response.getStatusCode().isError()) {
-//                    String message = new String(response.getBody().readAllBytes());
-//                    throw new OrderInventoryRequestRuntimeException(message, response.getStatusCode());
-//                }
-//            })
+            .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+                if (response.getStatusCode().isError()) {
+                    String message = new String(response.getBody().readAllBytes());
+                    throw new GraphQLOrderRequestRuntimeException(message, response.getStatusCode());
+                }
+            })
             .build();
 
     public Order getOrder(String id) {

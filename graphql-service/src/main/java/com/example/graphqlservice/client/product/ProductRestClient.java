@@ -1,6 +1,8 @@
 package com.example.graphqlservice.client.product;
 
 import com.example.graphqlservice.data.model.Product;
+import com.example.graphqlservice.exception.GraphQLProductRequestRuntimeException;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -9,12 +11,12 @@ public class ProductRestClient {
 
     private final RestClient restClient = RestClient.builder()
             .baseUrl("http://product-service:8080/api/products")
-//            .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
-//                if (response.getStatusCode().isError()) {
-//                    String message = new String(response.getBody().readAllBytes());
-//                    throw new OrderInventoryRequestRuntimeException(message, response.getStatusCode());
-//                }
-//            })
+            .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+                if (response.getStatusCode().isError()) {
+                    String message = new String(response.getBody().readAllBytes());
+                    throw new GraphQLProductRequestRuntimeException(message, response.getStatusCode());
+                }
+            })
             .build();
 
     public Product getProduct(int id) {
