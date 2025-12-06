@@ -117,8 +117,8 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@order-service-db:27017/order-service?authSource=admin
       SPRING_APPLICATION_NAME: order-service
-      SPRING_PROFILES_ACTIVE: grpc
-#      SPRING_PROFILES_ACTIVE: rest
+#      SPRING_PROFILES_ACTIVE: grpc
+      SPRING_PROFILES_ACTIVE: rest
 
   order-service-db:
     image: mongo:7
@@ -173,6 +173,16 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+
+  graphql-service:
+    build: ./graphql-service
+    container_name: graphql-service
+    image: graphql-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - order-service
+      - product-service
 
 volumes:
   notification_service_mongo_data:

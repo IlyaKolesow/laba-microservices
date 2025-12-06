@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: graphql-service
+  graphql:
+    graphiql:
+      enabled: true
+
+server:
+  port: 8084
